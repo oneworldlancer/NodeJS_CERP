@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-//const fetch = require("node-fetch");
+const fetch = require("node-fetch");
 const { google } = require("googleapis");
 const express = require("express");
 const app = express();
@@ -12,10 +12,10 @@ const iGoogle_Client_ID =
 
 const iGoogle_Client_Secret = "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";
 
-const iGoogle_Redirect_URL =
-	"https://app.contenterp.com/api/contents/doc/auth/google/callback";
+// const iGoogle_Redirect_URL =
+// 	"https://app.contenterp.com/api/contents/doc/auth/google/callback";
 
-// const iGoogle_Redirect_URL = "http://localhost:3000/auth/google/callback";
+const iGoogle_Redirect_URL = "http://localhost:3000/auth/google/callback";
 
 let iGoogle_Code;
 let iGoogle_UAuthorizationHeader;
@@ -106,8 +106,24 @@ async function CERP_CREATE_Document(req, res) {
 		// Get Doc-Name
 		var docTokenID = "doc_" + new Date().getTime();
 
-		// Set axios
+		let payloads = {
+			name: docTokenID,
+			mimeType: "application/vnd.google-apps.document",
+		};
+
+		console.log("*** - Google-payloads : " + payloads);
+
+		var options = {
+			contentType: "application/json",
+			method: "post",
+			headers: headers, //,
+			body: JSON.stringify(payloads), //here this is how you send your datas
+		};
+
+		console.log("*** - Google-options : " + options);
+
 		axios
+			//.headers = headers
 			.post(
 				"https://www.googleapis.com/drive/v3/files",
 				{
@@ -119,14 +135,17 @@ async function CERP_CREATE_Document(req, res) {
 				}
 			)
 			.then(function (response) {
+				//console.log(response);
+
 				console.log("*** - Google-response : " + response.data);
 
 				res
-					.setHeader("Content-Type", "application/json")
+					//.setHeader("Content-Type", "application/json")
 
 					.send(response.data);
 			});
 
+ 
 		// ...
 	} catch (error) {
 		console.log(error);
